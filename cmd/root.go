@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	version  string
-	basename string
+	version  string // The version of the program; injected at compile time.
+	basename string // The basename of the program; injected at compile time.
 
 	rootCmd = &cobra.Command{
 		Use:   basename,
