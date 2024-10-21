@@ -14,6 +14,7 @@ var (
 	version  string // The version of the program; injected at compile time.
 	basename string // The basename of the program; injected at compile time.
 
+	// Define the root command.
 	rootCmd = &cobra.Command{
 		Use:   basename,
 		Short: "A git worktree helper.",
