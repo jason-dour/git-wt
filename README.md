@@ -25,6 +25,23 @@ Commands are:
 - `ls`
   - List the worktrees in the project.
 
+## Project Layout
+
+```mermaid
+graph TD
+  root[Project Folder]
+  cfg[.git-wt
+  Config File]
+  def[default_branch_name
+  Folder]
+  wt[worktree_name...
+  Worktree Folders]
+
+  root---cfg
+  root---def
+  root---wt
+```
+
 ## Git Worktree Coverage
 
 The goal is to cover the `git worktree` commands essential to a worktree-based
