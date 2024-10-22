@@ -5,9 +5,14 @@
 package main
 
 import (
-	"github.com/jason-dour/git-wt/cmd"
+	"os"
+
+	"github.com/jason-dour/git-wt/internal/cobra/root"
 )
 
 func main() {
-	cmd.Execute()
+	err := root.Cmd.Execute()
+	if err != nil {
+		os.Exit(1)
+	}
 }
