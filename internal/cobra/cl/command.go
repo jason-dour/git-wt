@@ -34,7 +34,7 @@ func run(cmd *cobra.Command, args []string) error {
 	cmn.Debug("%s: %s: retrieving default branch from remote\n", command, funcName)
 	defaultBranch, err := git.GetDefaultBranch(args[0])
 	if err != nil {
-		cmn.Exit(11, "could not retrieve default branch: %v", err.Error())
+		return fmt.Errorf("could not retrieve default branch: %v", err.Error())
 	}
 	cmn.Debug("%s: run: defaultBranch: %v\n", command, defaultBranch)
 
@@ -46,13 +46,13 @@ func run(cmd *cobra.Command, args []string) error {
 	// Clone the repository.
 	err = git.Clone(args[0], defaultBranch, clonePath)
 	if err != nil {
-		cmn.Exit(12, "could not clone repo: %v", err.Error())
+		return fmt.Errorf("could not clone repo: %v", err.Error())
 	}
 
 	// Write config file to project path.
 	err = cmn.WriteConfig(repo, defaultBranch)
 	if err != nil {
-		cmn.Exit(13, "error writing config file: %v", err.Error())
+		return fmt.Errorf("error writing config file: %v", err.Error())
 	}
 
 	fmt.Printf("Clone complete.\n")

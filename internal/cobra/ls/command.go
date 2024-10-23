@@ -1,5 +1,5 @@
 // Package list implements the list subcommand for git-wt.
-package list
+package ls
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ func run(cmd *cobra.Command, args []string) error {
 
 	output, err := git.WorktreeList()
 	if err != nil {
-		cmn.Exit(20, "error listing worktrees: %s", err.Error())
+		return fmt.Errorf("error listing worktrees: %s", err.Error())
 	}
 	fmt.Print(string(output))
 

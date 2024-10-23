@@ -4,8 +4,10 @@ package root
 import (
 	"github.com/jason-dour/git-wt/internal/cmn"
 	"github.com/jason-dour/git-wt/internal/cobra/cl"
-	"github.com/jason-dour/git-wt/internal/cobra/list"
+	"github.com/jason-dour/git-wt/internal/cobra/ls"
 	"github.com/jason-dour/git-wt/internal/cobra/mk"
+	"github.com/jason-dour/git-wt/internal/cobra/mv"
+	"github.com/jason-dour/git-wt/internal/cobra/rm"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +28,9 @@ func init() {
 	Cmd.PersistentFlags().BoolVarP(&cmn.DebugFlag, "debug", "d", false, "enable debug mode")
 
 	// Sub-Commands
-	Cmd.AddCommand(mk.Cmd)
 	Cmd.AddCommand(cl.Cmd)
-	Cmd.AddCommand(list.Cmd)
+	Cmd.AddCommand(ls.Cmd)
+	Cmd.AddCommand(mk.Cmd)
+	Cmd.AddCommand(mv.Cmd)
+	Cmd.AddCommand(rm.Cmd)
 }

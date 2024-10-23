@@ -9,6 +9,25 @@ import (
 	"slices"
 )
 
+type (
+	CfgMk struct {
+		Branch      string
+		BranchReset string
+		CheckoutNo  bool
+		Force       bool
+		Track       bool
+		Quiet       bool
+	} // Configuration for 'mk' command.
+
+	CfgRm struct {
+		Force bool
+	} // Configuration for 'rm' command.
+
+	CfgMv struct {
+		Force bool
+	} // Configuration for 'mv' command.
+)
+
 var (
 	Basename string // Base name of the program; injected during compile.
 	Version  string // Version of the program; injected during compile.
@@ -95,7 +114,7 @@ func walkUpTree(path string) (string, error) {
 			continue
 		} else {
 			ProjectDir = target
-			Debug("%s: project dir: %s", funcName, ProjectDir)
+			Debug("%s: project dir: %s\n", funcName, ProjectDir)
 			Debug("%s: end\n", funcName)
 			return filename, nil
 		}

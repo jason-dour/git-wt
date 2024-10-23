@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gogs/git-module"
 	"github.com/jason-dour/git-wt/internal/cmn"
@@ -81,14 +82,137 @@ func GetDefaultBranch(url string) (string, error) {
 	return defaultBranch, nil
 }
 
+// WorktreeAdd will add a worktree to the project.
+func WorktreeAdd(config *cmn.CfgMk, worktree string, commitish string) ([]byte, error) {
+	funcName := "git.WorktreeAdd"
+	cmn.Debug("%s: begin\n", funcName)
+	cmn.Debug("%s: config: %#v\n", funcName, config)
+
+	cmd := git.NewCommand("worktree")
+	cmd.AddArgs("add")
+
+	if config.Quiet {
+		cmd.AddArgs("--quiet")
+	}
+	if config.Force {
+		cmd.AddArgs("--force")
+	}
+	if config.CheckoutNo {
+		cmd.AddArgs("--no-checkout")
+	}
+	if config.Track {
+		cmd.AddArgs("--track")
+	}
+	if len(config.Branch) > 0 {
+		cmd.AddArgs("-b", config.Branch)
+	}
+	if len(config.BranchReset) > 0 {
+		cmd.AddArgs("-B", config.BranchReset)
+	}
+
+	cmd.AddArgs(filepath.Join(cmn.ProjectDir, worktree))
+	cmd.AddArgs(commitish)
+
+	cmn.Debug("%s: command: %s\n", funcName, cmd.String())
+
+	runDir := ""
+	if cmn.InitialDir == cmn.ProjectDir {
+		runDir = filepath.Join(cmn.InitialDir, cmn.DefaultBranch)
+	} else {
+		runDir = cmn.InitialDir
+	}
+	output, err := cmd.RunInDir(runDir)
+	if err != nil {
+		return nil, err
+	}
+	cmn.Debug("%s: output length: %d\n", funcName, len(output))
+
+	cmn.Debug("%s: end\n", funcName)
+	return output, nil
+}
+
 // WorktreeList will list all worktrees in the project.
 func WorktreeList() ([]byte, error) {
-	funcName := "git.ListWorktrees"
+	funcName := "git.WorktreeList"
 	cmn.Debug("%s: begin\n", funcName)
 
 	cmd := git.NewCommand("worktree")
 	cmd.AddArgs("list")
 	cmn.Debug("%s: command: %s\n", funcName, cmd.String())
+
+	runDir := ""
+	if cmn.InitialDir == cmn.ProjectDir {
+		runDir = filepath.Join(cmn.InitialDir, cmn.DefaultBranch)
+	} else {
+		runDir = cmn.InitialDir
+	}
+	output, err := cmd.RunInDir(runDir)
+	if err != nil {
+		return nil, err
+	}
+	cmn.Debug("%s: output length: %d\n", funcName, len(output))
+
+	cmn.Debug("%s: end\n", funcName)
+	return output, nil
+}
+
+// WorktreeMove will move a worktree within the project.
+func WorktreeMove(config *cmn.CfgMv, wtOriginal string, wtNew string) ([]byte, error) {
+	funcName := "git.WorktreeMove"
+	cmn.Debug("%s: begin\n", funcName)
+	cmn.Debug("%s: config: %#v\n", funcName, config)
+
+	cmd := git.NewCommand("worktree")
+	cmd.AddArgs("move")
+
+	if config.Force {
+		cmd.AddArgs("--force")
+	}
+
+	cmd.AddArgs(filepath.Join(cmn.ProjectDir, wtOriginal), filepath.Join(cmn.ProjectDir, wtNew))
+
+	cmn.Debug("%s: command: %s\n", funcName, cmd.String())
+
+	if strings.HasPrefix(cmn.InitialDir, filepath.Join(cmn.ProjectDir, wtOriginal)) {
+		return nil, fmt.Errorf("cannot move worktree; current working directory within worktree")
+	}
+
+	runDir := ""
+	if cmn.InitialDir == cmn.ProjectDir {
+		runDir = filepath.Join(cmn.InitialDir, cmn.DefaultBranch)
+	} else {
+		runDir = cmn.InitialDir
+	}
+	output, err := cmd.RunInDir(runDir)
+	if err != nil {
+		return nil, err
+	}
+	cmn.Debug("%s: output length: %d\n", funcName, len(output))
+
+	cmn.Debug("%s: end\n", funcName)
+	return output, nil
+}
+
+// WorktreeRemove will remove a worktree from the project.
+func WorktreeRemove(config *cmn.CfgRm, worktree string) ([]byte, error) {
+	funcName := "git.WorktreeRemove"
+	cmn.Debug("%s: begin\n", funcName)
+	cmn.Debug("%s: config: %#v\n", funcName, config)
+
+	cmd := git.NewCommand("worktree")
+	cmd.AddArgs("remove")
+
+	if config.Force {
+		cmd.AddArgs("--force")
+	}
+
+	cmd.AddArgs(worktree)
+
+	cmn.Debug("%s: command: %s\n", funcName, cmd.String())
+
+	if strings.HasPrefix(cmn.InitialDir, filepath.Join(cmn.ProjectDir, worktree)) {
+		return nil, fmt.Errorf("cannot remove worktree; current working directory within worktree")
+	}
 
 	runDir := ""
 	if cmn.InitialDir == cmn.ProjectDir {

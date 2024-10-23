@@ -2,6 +2,11 @@
 
 Git Extension For Worktree Management
 
+## Caveat Emptor
+
+This is very new code. It has not had extensive testing. Use in full knowledge
+there may be bugs.
+
 ## Purpose
 
 This helper is intended to assist in managing git worktrees in a workflow based
@@ -26,6 +31,10 @@ Commands are:
     - List the worktrees in the project.
 - `mk`
     - Add a worktree to the project.
+- `mv`
+    - Move a worktree within the project.
+- `rm`
+    - Remove a worktree from the project.
 
 ## Project Layout
 
@@ -47,15 +56,16 @@ graph TD
 ## Git Worktree Coverage
 
 The goal is to cover the `git worktree` commands essential to a worktree-based
-workflow. Not every command is likely to be implemented.
+workflow. Not every command is likely to be implemented, or implemented with all
+possible flags.
 
-| Git Worktree Command | git-wt Command | Notes                   |
-| -------------------- | -------------- | ----------------------- |
-| list                 | ls             | No arguments supported. |
-| add                  | mk             | Not implemented yet.    |
-| remove               | rm             | Not implemented yet.    |
-| move                 | mv             | Not implemented yet.    |
-| prune                | tbd            | Under review.           |
-| lock                 | n/a            | No intent to implement. |
-| unlock               | n/a            | No intent to implement. |
-| repair               | n/a            | No intent to implement. |
+| Git Worktree Command | git-wt Command | Notes                                     |
+| -------------------- | -------------- | ----------------------------------------- |
+| list                 | ls             | No arguments supported.                   |
+| add                  | mk             | Does not implement locks or guess-remote. |
+| remove               | rm             | Full implementation.                      |
+| move                 | mv             | Full implementation.                      |
+| prune                | tbd            | Under review.                             |
+| lock                 | n/a            | No intent to implement.                   |
+| unlock               | n/a            | No intent to implement.                   |
+| repair               | n/a            | No intent to implement.                   |
