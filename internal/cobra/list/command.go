@@ -1,3 +1,4 @@
+// Package list implements the list subcommand for git-wt.
 package list
 
 import (
@@ -24,7 +25,7 @@ func run(cmd *cobra.Command, args []string) error {
 	funcName := "run"
 	cmn.Debug("%s: %s: begin\n", command, funcName)
 
-	output, err := git.ListWorktrees()
+	output, err := git.WorktreeList()
 	if err != nil {
 		cmn.Exit(20, "error listing worktrees: %s", err.Error())
 	}

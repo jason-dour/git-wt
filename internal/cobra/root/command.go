@@ -1,13 +1,11 @@
-// cmd/root
-//
-// Root command for git-wt.
-
+// Package root implements the root command for git-wt.
 package root
 
 import (
 	"github.com/jason-dour/git-wt/internal/cmn"
-	"github.com/jason-dour/git-wt/internal/cobra/clone"
+	"github.com/jason-dour/git-wt/internal/cobra/cl"
 	"github.com/jason-dour/git-wt/internal/cobra/list"
+	"github.com/jason-dour/git-wt/internal/cobra/mk"
 	"github.com/spf13/cobra"
 )
 
@@ -28,6 +26,7 @@ func init() {
 	Cmd.PersistentFlags().BoolVarP(&cmn.DebugFlag, "debug", "d", false, "enable debug mode")
 
 	// Sub-Commands
-	Cmd.AddCommand(clone.Cmd)
+	Cmd.AddCommand(mk.Cmd)
+	Cmd.AddCommand(cl.Cmd)
 	Cmd.AddCommand(list.Cmd)
 }

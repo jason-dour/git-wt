@@ -1,4 +1,5 @@
-package clone
+// Package cl implements the cl subcommand for git-wt.
+package cl
 
 import (
 	"fmt"
@@ -11,13 +12,13 @@ import (
 )
 
 var (
-	command = "clone" // Command name.
+	command = "cl" // Command name.
 	Cmd     = &cobra.Command{
 		Use:     command + " repo_url",
 		Short:   "Clone a repo for a git-wt workflow.",
 		Long:    cmn.Basename + " " + command + " - Clone a repo for a git-wt workflow.",
 		Args:    cobra.ExactArgs(1),
-		Aliases: []string{"cl", "clo", "clon"},
+		Aliases: []string{"clone"},
 		RunE:    run,
 	} // Cobra command definition for the 'clone' command.
 )

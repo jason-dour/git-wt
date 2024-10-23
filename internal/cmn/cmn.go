@@ -1,3 +1,5 @@
+// Package cmn implements common variables and utility functions for git-wt,
+// providing debug, exit, and configuration.
 package cmn
 
 import (
@@ -5,6 +7,17 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+)
+
+var (
+	Basename string // Base name of the program; injected during compile.
+	Version  string // Version of the program; injected during compile.
+
+	DebugFlag bool // Whether debug output is enabled.
+
+	InitialDir    string // Initial working directory of the program.
+	ProjectDir    string // Path of the project directory.
+	DefaultBranch string // Default branch/worktree of the project.
 )
 
 // Debug writes debug output to Stderr if DebugFlag is true.
@@ -30,7 +43,7 @@ func WriteConfig(path string, branch string) error {
 	Debug("%s: config filename: %s\n", funcName, filename)
 
 	// Open the configuration file to write the config.
-	cfgFile, err := os.OpenFile(filename, os.O_TRUNC|os.O_CREATE|os.O_SYNC|os.O_RDWR, 0644)
+	cfgFile, err := os.OpenFile(filename, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("could not create config file: %v", err.Error())
 	}
@@ -89,6 +102,7 @@ func walkUpTree(path string) (string, error) {
 	}
 }
 
+// InitConfig locates and reads the configuration file for use.
 func InitConfig() {
 	funcName := "cmn.initConfig"
 	Debug("%s: begin\n", funcName)

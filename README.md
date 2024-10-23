@@ -19,11 +19,13 @@ Syntax is: `git wt <command>`
 
 Commands are:
 
-- `clone`
-  - Prepare a project directory by cloning the default branch and writing a
-    `git-wt` configuration file in that project directory.
+- `cl`
+    - Prepare a project directory by cloning the default branch and writing a
+      `git-wt` configuration file in that project directory.
 - `ls`
-  - List the worktrees in the project.
+    - List the worktrees in the project.
+- `mk`
+    - Add a worktree to the project.
 
 ## Project Layout
 
@@ -50,7 +52,7 @@ workflow. Not every command is likely to be implemented.
 | Git Worktree Command | git-wt Command | Notes                   |
 | -------------------- | -------------- | ----------------------- |
 | list                 | ls             | No arguments supported. |
-| add                  | add            | Not implemented yet.    |
+| add                  | mk             | Not implemented yet.    |
 | remove               | rm             | Not implemented yet.    |
 | move                 | mv             | Not implemented yet.    |
 | prune                | tbd            | Under review.           |
