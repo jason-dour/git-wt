@@ -16,44 +16,34 @@ build:
 .PHONY: build
 
 windows:
-	@GOOS=windows
-	@GOARCH=386
-	@go build -ldflags $(LDFLAGS) -o $(BASENAME).exe ./cmd/${BASENAME}
-	@zip -q9 $(BASENAME).v$(VERSION).32bit.windows.zip $(BASENAME).exe
+	@GOOS=windows GOARCH=amd64 go build -ldflags $(LDFLAGS) -o $(BASENAME).exe ./cmd/${BASENAME}
+	@zip -q9 $(BASENAME)_v$(VERSION)_windows_amd64.zip $(BASENAME).exe
 	@$(RM) $(BASENAME).exe
-	@GOARCH=amd64
-	@go build -ldflags $(LDFLAGS) -o $(BASENAME).exe ./cmd/${BASENAME}
-	@zip -q9 $(BASENAME).v$(VERSION).64bit.windows.zip $(BASENAME).exe
+	@GOOS=windows GOARCH=arm64 go build -ldflags $(LDFLAGS) -o $(BASENAME).exe ./cmd/${BASENAME}
+	@zip -q9 $(BASENAME)_v$(VERSION)_windows_arm64.zip $(BASENAME).exe
 	@$(RM) $(BASENAME).exe
 .PHONY: windows
 
 linux:
-	@GOOS=linux
-	@GOARCH=386
-	@go build -ldflags $(LDFLAGS) -o $(BASENAME) ./cmd/${BASENAME}
-	@tar -zcf $(BASENAME).v$(VERSION).32bit.linux.tar.gz $(BASENAME)
+	@GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) -o $(BASENAME) ./cmd/${BASENAME}
+	@tar -zcf $(BASENAME)_v$(VERSION)_linux_amd64.tar.gz $(BASENAME)
 	@$(RM) $(BASENAME)
-	@GOARCH=amd64
-	@go build -ldflags $(LDFLAGS) -o $(BASENAME) ./cmd/${BASENAME}
-	@tar -zcf $(BASENAME).v$(VERSION).64bit.linux.tar.gz $(BASENAME)
+	@GOOS=linux GOARCH=arm64 go build -ldflags $(LDFLAGS) -o $(BASENAME) ./cmd/${BASENAME}
+	@tar -zcf $(BASENAME)_v$(VERSION)_linux_arm64.tar.gz $(BASENAME)
 	@$(RM) $(BASENAME)
 .PHONY: linux
 
 macos:
-	@GOOS=darwin
-	@GOARCH=amd64
-	@go build -ldflags $(LDFLAGS) -o $(BASENAME) ./cmd/${BASENAME}
-	@tar -zcf $(BASENAME).v$(VERSION).64bit.macos.tar.gz $(BASENAME)
-	@$(RM) $(BASENAME)
-	@GOARCH=arm64
-	@go build -ldflags $(LDFLAGS) -o $(BASENAME) ./cmd/${BASENAME}
-	@tar -zcf $(BASENAME).v$(VERSION).64bit.macos.tar.gz $(BASENAME)
-	@$(RM) $(BASENAME)
+	@GOOS=darwin GOARCH=amd64 go build -ldflags $(LDFLAGS) -o $(BASENAME)_amd64 ./cmd/${BASENAME}
+	@GOOS=darwin GOARCH=arm64 go build -ldflags $(LDFLAGS) -o $(BASENAME)_arm64 ./cmd/${BASENAME}
+	@lipo -create -output ${BASENAME} ${BASENAME}_amd64 ${BASENAME}_arm64
+	@tar -zcf $(BASENAME)_v$(VERSION)_macos_universal.tar.gz $(BASENAME)
+	@$(RM) $(BASENAME) $(BASENAME)_a*
 .PHONY: macos
 
 release: windows linux macos
 .PHONY: release
 
 clean:
-	@$(RM) $(BASENAME) $(BASENAME).v*
+	@$(RM) $(BASENAME) $(BASENAME).v* $(BASENAME)_*
 .PHONY: clean
