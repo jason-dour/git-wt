@@ -23,7 +23,7 @@ var (
 		Args:    cobra.NoArgs,
 		Aliases: []string{"list"},
 		RunE:    run,
-	} // Cobra command definition for the 'list' command.
+	} // Cobra command definition for the 'xx' command.
 )
 
 // init performs initialization for the 'mk' command.
@@ -42,20 +42,24 @@ func checkConfig() error {
 	cmn.Debug("%s: %s: check if most/all used with branches/worktrees", command, funcName)
 	if (config.Most || config.All) && (config.Branches || config.Worktrees) {
 		if config.Most {
+			cmn.Debug("%s: %s: error: end", command, funcName)
 			return fmt.Errorf("most and branches/worktrees set; use one or the other")
 		}
 		if config.All {
+			cmn.Debug("%s: %s: error: end", command, funcName)
 			return fmt.Errorf("all and branches/worktrees set; use one or the other")
 		}
 	}
 
 	cmn.Debug("%s: %s: check if most and all both set", command, funcName)
 	if config.Most && config.All {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("most and all both set; use one or the other")
 	}
 
 	cmn.Debug("%s: %s: check if anything specified to reset", command, funcName)
 	if !(config.Branches || config.Worktrees || config.Most || config.All) {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("no flags; must specify what to reset")
 	}
 
@@ -71,6 +75,7 @@ func deleteProjectContents() error {
 	cmn.Debug("%s: %s: reading project directory contents", command, funcName)
 	contents, err := os.ReadDir(cmn.Config.ProjectDir)
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("error reading directory contents: %s", err.Error())
 	}
 	cmn.Debug("%s: %s: found %d entries in directory", command, funcName, len(contents))
@@ -81,6 +86,7 @@ func deleteProjectContents() error {
 				cmn.Debug("%s: %s: deleting %s", command, funcName, v.Name())
 				err := os.RemoveAll(v.Name())
 				if err != nil {
+					cmn.Debug("%s: %s: error: end", command, funcName)
 					return fmt.Errorf("error deleting %s: %s", v.Name(), err.Error())
 				}
 			} else {
@@ -104,6 +110,7 @@ func deleteWorktrees() error {
 	cmn.Debug("%s: %s: retrieving list of worktrees", command, funcName)
 	output, err := git.WorktreeList(true)
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("error listing worktrees: %s", err.Error())
 	}
 
@@ -132,6 +139,7 @@ func deleteWorktrees() error {
 		cmn.Debug("%s: %s: deleting worktree: %s", command, funcName, v)
 		_, err := git.WorktreeRemove(&cmn.CfgRm{Force: true}, v)
 		if err != nil {
+			cmn.Debug("%s: %s: error: end", command, funcName)
 			return fmt.Errorf("error removing worktree: %s", err.Error())
 		}
 		fmt.Printf("Deleted worktree: %s\n", v)
@@ -148,6 +156,7 @@ func deleteBranches() error {
 
 	branches, err := git.GetBranches()
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("error getting branches: %s", err.Error())
 	}
 	cmn.Debug("%s: %s: branches: %v", command, funcName, branches)
@@ -155,6 +164,7 @@ func deleteBranches() error {
 	cmn.Debug("%s: %s: retrieving worktrees", command, funcName)
 	worktrees, err := git.WorktreeList(true)
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("error retrieving worktrees: %s", err.Error())
 	}
 
@@ -174,10 +184,12 @@ func deleteBranches() error {
 		} else {
 			cmn.Debug("%s: %s: deleting branch: %s", command, funcName, v)
 			if _, ok := worktree_branches[v]; ok {
+				cmn.Debug("%s: %s: error: end", command, funcName)
 				return fmt.Errorf("branch checked out in worktree, remove worktree first: %s", v)
 			} else {
 				err := git.DeleteBranch(v)
 				if err != nil {
+					cmn.Debug("%s: %s: error: end", command, funcName)
 					return fmt.Errorf("error deleting branch: %s", err.Error())
 				}
 				fmt.Printf("Deleted branch: %s\n", v)
@@ -189,6 +201,7 @@ func deleteBranches() error {
 	return nil
 }
 
+// run is the main function for the 'xx' command.
 func run(cmd *cobra.Command, args []string) error {
 	funcName := "run"
 	cmn.Debug("%s: %s: begin", command, funcName)
@@ -197,6 +210,7 @@ func run(cmd *cobra.Command, args []string) error {
 	cmn.Debug("%s: %s: loading global config", command, funcName)
 	err := cmn.InitConfig()
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("error loading configuration: %s", err.Error())
 	}
 	cmn.Debug("%s: %s: global config: %#v", command, funcName, cmn.Config)
@@ -204,6 +218,7 @@ func run(cmd *cobra.Command, args []string) error {
 	cmn.Debug("%s: %s: checking if in safe directory", command, funcName)
 	if cmn.Config.InitialDir != cmn.Config.ProjectDir {
 		// Not in ProjectDir; unsafe.
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("not in project dir: change dir to %s", cmn.Config.ProjectDir)
 	}
 	cmn.Debug("%s: %s: in project directory, proceeding", command, funcName)
@@ -211,6 +226,7 @@ func run(cmd *cobra.Command, args []string) error {
 	// Check configuration.
 	err = checkConfig()
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return err
 	}
 
@@ -221,6 +237,7 @@ func run(cmd *cobra.Command, args []string) error {
 		cmn.Debug("%s: %s: determine remote for cloning after delete", command, funcName)
 		remote, err := git.GetRemote(filepath.Join(cmn.Config.InitialDir, cmn.Config.DefaultBranch))
 		if err != nil {
+			cmn.Debug("%s: %s: error: end", command, funcName)
 			return fmt.Errorf("error determining remote to clone after reset: %s", err.Error())
 		}
 		cmn.Debug("%s: %s: remote: %s\n", command, funcName, remote)
@@ -228,12 +245,14 @@ func run(cmd *cobra.Command, args []string) error {
 		cmn.Debug("%s: %s: deleting contents of project directory", command, funcName)
 		err = deleteProjectContents()
 		if err != nil {
+			cmn.Debug("%s: %s: error: end", command, funcName)
 			return fmt.Errorf("error deleting project contents: %s", err.Error())
 		}
 
 		cmn.Debug("%s: %s: cloning remote: %s", command, funcName, remote)
 		err = git.Clone(remote, cmn.Config.DefaultBranch, cmn.Config.DefaultBranch)
 		if err != nil {
+			cmn.Debug("%s: %s: error: end", command, funcName)
 			return fmt.Errorf("error cloning remote: %s", err.Error())
 		}
 	}
@@ -243,6 +262,7 @@ func run(cmd *cobra.Command, args []string) error {
 		cmn.Debug("%s: %s: deleting worktrees", command, funcName)
 		err := deleteWorktrees()
 		if err != nil {
+			cmn.Debug("%s: %s: error: end", command, funcName)
 			return fmt.Errorf("error deleting worktrees: %s", err.Error())
 		}
 	}
@@ -252,6 +272,7 @@ func run(cmd *cobra.Command, args []string) error {
 		cmn.Debug("%s: %s: deleting branches", command, funcName)
 		err := deleteBranches()
 		if err != nil {
+			cmn.Debug("%s: %s: error: end", command, funcName)
 			return fmt.Errorf("error deleting branches: %s", err.Error())
 		}
 	}

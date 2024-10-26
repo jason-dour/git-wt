@@ -39,7 +39,7 @@ type (
 		Worktrees bool // Whether to reset worktrees.
 		Most      bool // Whether to reset both branches and worktrees.
 		All       bool // Whether to wipe everyting and clone again.
-	}
+	} // Configuration for 'xx' command.
 )
 
 var (
@@ -67,7 +67,7 @@ func WriteConfig(path string, branch string) error {
 	// Open the configuration file to write the config.
 	cfgFile, err := os.OpenFile(filename, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
-		Debug("%s: end", funcName)
+		Debug("%s: error: end", funcName)
 		return fmt.Errorf("could not create config file: %v", err.Error())
 	}
 	defer cfgFile.Close()
@@ -89,7 +89,7 @@ func findConfig(cwd string) (string, error) {
 
 	cfgFile, err := walkUpTree(cwd)
 	if err != nil {
-		Debug("%s: end", funcName)
+		Debug("%s: error: end", funcName)
 		return "", fmt.Errorf("no project config file found")
 	}
 
@@ -112,7 +112,7 @@ func walkUpTree(path string) (string, error) {
 			target, _ = filepath.Split(target)
 			target = filepath.Clean(target)
 			if target == "/" {
-				Debug("%s: end", funcName)
+				Debug("%s: error: end", funcName)
 				return "", fmt.Errorf("no project config file")
 			}
 			continue
@@ -133,7 +133,7 @@ func InitConfig() error {
 	// Get the current working directory.
 	cwd, err := os.Getwd()
 	if err != nil {
-		Debug("%s: end", funcName)
+		Debug("%s: error: end", funcName)
 		return fmt.Errorf("%s: error locating working directory: %s", funcName, err.Error())
 	}
 	Config.InitialDir = cwd
@@ -142,7 +142,7 @@ func InitConfig() error {
 	// Locate the config file.
 	cfgFile, err := findConfig(Config.InitialDir)
 	if err != nil {
-		Debug("%s: end\n", funcName)
+		Debug("%s: error: end\n", funcName)
 		return fmt.Errorf("%s: error locating config: %s", funcName, err.Error())
 	}
 	Debug("%s: config file: %s", funcName, cfgFile)
@@ -150,7 +150,7 @@ func InitConfig() error {
 	// Read the config file.
 	file, err := os.ReadFile(cfgFile)
 	if err != nil {
-		Debug("%s: end", funcName)
+		Debug("%s: error: end", funcName)
 		return fmt.Errorf("%s: error reading config file: %s", funcName, err.Error())
 	}
 	Debug("%s: config file contents > %s", funcName, string(file))
@@ -158,7 +158,7 @@ func InitConfig() error {
 		if slices.Equal(file[0:9], []byte("default: ")) {
 			Config.DefaultBranch = string(file[9:])
 		} else {
-			Debug("%s: end", funcName)
+			Debug("%s: error: end", funcName)
 			return fmt.Errorf(":%s: error parsing config file: invalid format", funcName)
 		}
 	}

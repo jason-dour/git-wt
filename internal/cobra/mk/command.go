@@ -39,11 +39,13 @@ func checkConfig() error {
 
 	cmn.Debug("%s: %s: check mutually exclusive branch flags", command, funcName)
 	if len(config.Branch) > 0 && len(config.BranchReset) > 0 {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("config: set branch with either -b or -B; don't use both")
 	}
 
 	cmn.Debug("%s: %s: check track has a new branch in flags", command, funcName)
 	if config.Track && !(len(config.Branch) > 0 || len(config.BranchReset) > 0) {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("config: track requires new branch via -b or -B")
 	}
 
@@ -51,7 +53,7 @@ func checkConfig() error {
 	return nil
 }
 
-// run provides the core execution of the 'mk' command.
+// run is the main function for the 'mk' command.
 func run(cmd *cobra.Command, args []string) error {
 	funcName := "run"
 	cmn.Debug("%s: %s: begin", command, funcName)
@@ -60,6 +62,7 @@ func run(cmd *cobra.Command, args []string) error {
 	cmn.Debug("%s: %s: loading global config", command, funcName)
 	err := cmn.InitConfig()
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("error loading configuration: %s", err.Error())
 	}
 	cmn.Debug("%s: %s: global config: %#v", command, funcName, cmn.Config)
@@ -78,12 +81,14 @@ func run(cmd *cobra.Command, args []string) error {
 	// Check configuration.
 	err = checkConfig()
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return err
 	}
 
 	// Add the worktree.
 	output, err := git.WorktreeAdd(config, wtName, commitish)
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return err
 	}
 	fmt.Print(string(output))

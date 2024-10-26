@@ -18,9 +18,10 @@ var (
 		Args:    cobra.NoArgs,
 		Aliases: []string{"list"},
 		RunE:    run,
-	} // Cobra command definition for the 'list' command.
+	} // Cobra command definition for the 'ls' command.
 )
 
+// run is the main function for the 'ls' command.
 func run(cmd *cobra.Command, args []string) error {
 	funcName := "run"
 	cmn.Debug("%s: %s: begin", command, funcName)
@@ -29,12 +30,14 @@ func run(cmd *cobra.Command, args []string) error {
 	cmn.Debug("%s: %s: loading global config", command, funcName)
 	err := cmn.InitConfig()
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("error loading configuration: %s", err.Error())
 	}
 	cmn.Debug("%s: %s: global config: %#v", command, funcName, cmn.Config)
 
 	output, err := git.WorktreeList(false)
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("error listing worktrees: %s", err.Error())
 	}
 	fmt.Print(string(output))

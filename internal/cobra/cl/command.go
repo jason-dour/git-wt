@@ -23,6 +23,7 @@ var (
 	} // Cobra command definition for the 'clone' command.
 )
 
+// run is the main function for the 'cl' command.
 func run(cmd *cobra.Command, args []string) error {
 	funcName := "run"
 	cmn.Debug("%s: %s: begin", command, funcName)
@@ -34,6 +35,7 @@ func run(cmd *cobra.Command, args []string) error {
 	cmn.Debug("%s: %s: retrieving default branch from remote", command, funcName)
 	defaultBranch, err := git.GetDefaultBranch(args[0])
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("could not retrieve default branch: %v", err.Error())
 	}
 	cmn.Debug("%s: run: defaultBranch: %v", command, defaultBranch)
@@ -46,12 +48,14 @@ func run(cmd *cobra.Command, args []string) error {
 	// Clone the repository.
 	err = git.Clone(args[0], defaultBranch, clonePath)
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("could not clone repo: %v", err.Error())
 	}
 
 	// Write config file to project path.
 	err = cmn.WriteConfig(repo, defaultBranch)
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("error writing config file: %v", err.Error())
 	}
 

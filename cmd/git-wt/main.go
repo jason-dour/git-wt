@@ -6,14 +6,18 @@
 //
 // Usage:
 //
-// git-wt [command]
+//	git-wt [command]
 //
 // Available Commands:
 //
-//	clone       Clone a repo for a git-wt workflow.
+//	cl          Clone a repo for a git-wt workflow.
 //	completion  Generate the autocompletion script for the specified shell
 //	help        Help about any command
 //	ls          List worktrees for the project.
+//	mk          Add a worktree to the project.
+//	mv          Move a worktree within the project.
+//	rm          Remove a worktree from the project.
+//	xx          Reset project.//
 //
 // Flags:
 //

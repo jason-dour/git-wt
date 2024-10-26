@@ -27,7 +27,7 @@ func init() {
 	Cmd.PersistentFlags().BoolVarP(&config.Force, "force", "f", false, "force removal even if worktree is dirty or locked")
 }
 
-// run provides the core execution of the 'rm' command.
+// run is the main function for the 'rm' command.
 func run(cmd *cobra.Command, args []string) error {
 	funcName := "run"
 	cmn.Debug("%s: %s: begin", command, funcName)
@@ -36,6 +36,7 @@ func run(cmd *cobra.Command, args []string) error {
 	cmn.Debug("%s: %s: loading global config", command, funcName)
 	err := cmn.InitConfig()
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("error loading configuration: %s", err.Error())
 	}
 	cmn.Debug("%s: %s: global config: %#v", command, funcName, cmn.Config)
@@ -50,6 +51,7 @@ func run(cmd *cobra.Command, args []string) error {
 	// Remove the worktree.
 	output, err := git.WorktreeRemove(config, wtName)
 	if err != nil {
+		cmn.Debug("%s: %s: error: end", command, funcName)
 		return err
 	}
 	fmt.Print(string(output))

@@ -28,6 +28,7 @@ func Clone(url string, branch string, path string) error {
 		Branch: branch,
 	})
 	if err != nil {
+		cmn.Debug("%s: error: end", funcName)
 		return fmt.Errorf("could not clone repo: %s", err.Error())
 	}
 
@@ -53,6 +54,7 @@ func DeleteBranch(branch string) error {
 			Force: true,
 		})
 	if err != nil {
+		cmn.Debug("%s: error: end", funcName)
 		return fmt.Errorf("error deleting branch: %s", err.Error())
 	}
 
@@ -67,11 +69,13 @@ func GetBranches() ([]string, error) {
 
 	repository, err := git.Open(filepath.Join(cmn.Config.ProjectDir, cmn.Config.DefaultBranch))
 	if err != nil {
+		cmn.Debug("%s: error: end", funcName)
 		return []string{}, fmt.Errorf("error opening repository: %s", err.Error())
 	}
 
 	branches, err := repository.Branches()
 	if err != nil {
+		cmn.Debug("%s: error: end", funcName)
 		return []string{}, fmt.Errorf("error getting branches: %s", err.Error())
 	}
 	cmn.Debug("%s: branches: %v", funcName, branches)
@@ -106,6 +110,7 @@ func GetDefaultBranch(url string) (string, error) {
 		},
 	})
 	if err != nil {
+		cmn.Debug("%s: error: end", funcName)
 		return "", fmt.Errorf("could not retrieve HEAD ref from remote: %s", err.Error())
 	}
 
@@ -121,6 +126,7 @@ func GetDefaultBranch(url string) (string, error) {
 
 	// If we couldn't find the default branch, return error.
 	if defaultBranch == "" {
+		cmn.Debug("%s: error: end", funcName)
 		return "", fmt.Errorf("could not determine default branch from HEAD ref")
 	}
 
@@ -143,6 +149,7 @@ func GetRemote(directory string) (string, error) {
 
 	output, err := cmd.RunInDir(directory)
 	if err != nil {
+		cmn.Debug("%s: error: end", funcName)
 		return "", err
 	}
 	cmn.Debug("%s: output length: %d", funcName, len(output))
@@ -201,6 +208,7 @@ func WorktreeAdd(config *cmn.CfgMk, worktree string, commitish string) ([]byte, 
 	}
 	output, err := cmd.RunInDir(runDir)
 	if err != nil {
+		cmn.Debug("%s: error: end", funcName)
 		return nil, err
 	}
 	cmn.Debug("%s: output length: %d", funcName, len(output))
@@ -231,6 +239,7 @@ func WorktreeList(porcelain bool) ([]byte, error) {
 	}
 	output, err := cmd.RunInDir(runDir)
 	if err != nil {
+		cmn.Debug("%s: error: end", funcName)
 		return nil, err
 	}
 	cmn.Debug("%s: output length: %d", funcName, len(output))
@@ -257,6 +266,7 @@ func WorktreeMove(config *cmn.CfgMv, wtOriginal string, wtNew string) ([]byte, e
 	cmn.Debug("%s: command: %s", funcName, cmd.String())
 
 	if strings.HasPrefix(cmn.Config.InitialDir, filepath.Join(cmn.Config.ProjectDir, wtOriginal)) {
+		cmn.Debug("%s: error: end", funcName)
 		return nil, fmt.Errorf("cannot move worktree; current working directory within worktree")
 	}
 
@@ -268,6 +278,7 @@ func WorktreeMove(config *cmn.CfgMv, wtOriginal string, wtNew string) ([]byte, e
 	}
 	output, err := cmd.RunInDir(runDir)
 	if err != nil {
+		cmn.Debug("%s: error: end", funcName)
 		return nil, err
 	}
 	cmn.Debug("%s: output length: %d", funcName, len(output))
@@ -294,6 +305,7 @@ func WorktreeRemove(config *cmn.CfgRm, worktree string) ([]byte, error) {
 	cmn.Debug("%s: command: %s", funcName, cmd.String())
 
 	if strings.HasPrefix(cmn.Config.InitialDir, filepath.Join(cmn.Config.ProjectDir, worktree)) {
+		cmn.Debug("%s: error: end", funcName)
 		return nil, fmt.Errorf("cannot remove worktree; current working directory within worktree")
 	}
 
@@ -305,6 +317,7 @@ func WorktreeRemove(config *cmn.CfgRm, worktree string) ([]byte, error) {
 	}
 	output, err := cmd.RunInDir(runDir)
 	if err != nil {
+		cmn.Debug("%s: error: end", funcName)
 		return nil, err
 	}
 	cmn.Debug("%s: output length: %d", funcName, len(output))
