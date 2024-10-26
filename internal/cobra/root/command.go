@@ -21,11 +21,8 @@ var (
 )
 
 func init() {
-	// Load configuration.
-	cobra.OnInitialize(cmn.InitConfig)
-
 	// Command flags.
-	Cmd.PersistentFlags().BoolVarP(&cmn.DebugFlag, "debug", "d", false, "enable debug mode")
+	Cmd.PersistentFlags().BoolVarP(&cmn.Config.DebugFlag, "debug", "d", false, "enable debug mode")
 
 	// Sub-Commands
 	Cmd.AddCommand(cl.Cmd)

@@ -33,7 +33,7 @@ func init() {
 }
 
 // checkConfig scans config for proper use of flags.
-func checkConfig(args []string) error {
+func checkConfig() error {
 	funcName := "checkConfig"
 	cmn.Debug("%s: %s: begin\n", command, funcName)
 
@@ -55,6 +55,15 @@ func checkConfig(args []string) error {
 func run(cmd *cobra.Command, args []string) error {
 	funcName := "run"
 	cmn.Debug("%s: %s: begin\n", command, funcName)
+
+	// Load global configuration.
+	cmn.Debug("%s: %s: loading global config\n", command, funcName)
+	err := cmn.InitConfig()
+	if err != nil {
+		return fmt.Errorf("error loading configuration: %s", err.Error())
+	}
+	cmn.Debug("%s: %s: global config: %#v\n", command, funcName, cmn.Config)
+
 	cmn.Debug("%s: %s: config: %#v\n", command, funcName, config)
 	cmn.Debug("%s: %s: args: %v\n", command, funcName, args)
 
@@ -67,7 +76,7 @@ func run(cmd *cobra.Command, args []string) error {
 	cmn.Debug("%s: %s: commit-ish: %s\n", command, funcName, commitish)
 
 	// Check configuration.
-	err := checkConfig(args)
+	err = checkConfig()
 	if err != nil {
 		return err
 	}

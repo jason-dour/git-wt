@@ -18,7 +18,7 @@ func Clone(url string, branch string, path string) error {
 	cmn.Debug("%s: begin\n", funcName)
 
 	// If Debug, set debug for git-module.
-	if cmn.DebugFlag {
+	if cmn.Config.DebugFlag {
 		git.SetOutput(os.Stderr)
 		git.SetPrefix("debug: git-module:")
 	}
@@ -39,7 +39,7 @@ func GetDefaultBranch(url string) (string, error) {
 	cmn.Debug("%s: begin\n", funcName)
 
 	// If Debug, set debug for git-module.
-	if cmn.DebugFlag {
+	if cmn.Config.DebugFlag {
 		git.SetOutput(os.Stderr)
 		git.SetPrefix("debug: git-module:")
 	}
@@ -110,16 +110,16 @@ func WorktreeAdd(config *cmn.CfgMk, worktree string, commitish string) ([]byte, 
 		cmd.AddArgs("-B", config.BranchReset)
 	}
 
-	cmd.AddArgs(filepath.Join(cmn.ProjectDir, worktree))
+	cmd.AddArgs(filepath.Join(cmn.Config.ProjectDir, worktree))
 	cmd.AddArgs(commitish)
 
 	cmn.Debug("%s: command: %s\n", funcName, cmd.String())
 
 	runDir := ""
-	if cmn.InitialDir == cmn.ProjectDir {
-		runDir = filepath.Join(cmn.InitialDir, cmn.DefaultBranch)
+	if cmn.Config.InitialDir == cmn.Config.ProjectDir {
+		runDir = filepath.Join(cmn.Config.InitialDir, cmn.Config.DefaultBranch)
 	} else {
-		runDir = cmn.InitialDir
+		runDir = cmn.Config.InitialDir
 	}
 	output, err := cmd.RunInDir(runDir)
 	if err != nil {
@@ -141,10 +141,10 @@ func WorktreeList() ([]byte, error) {
 	cmn.Debug("%s: command: %s\n", funcName, cmd.String())
 
 	runDir := ""
-	if cmn.InitialDir == cmn.ProjectDir {
-		runDir = filepath.Join(cmn.InitialDir, cmn.DefaultBranch)
+	if cmn.Config.InitialDir == cmn.Config.ProjectDir {
+		runDir = filepath.Join(cmn.Config.InitialDir, cmn.Config.DefaultBranch)
 	} else {
-		runDir = cmn.InitialDir
+		runDir = cmn.Config.InitialDir
 	}
 	output, err := cmd.RunInDir(runDir)
 	if err != nil {
@@ -169,19 +169,19 @@ func WorktreeMove(config *cmn.CfgMv, wtOriginal string, wtNew string) ([]byte, e
 		cmd.AddArgs("--force")
 	}
 
-	cmd.AddArgs(filepath.Join(cmn.ProjectDir, wtOriginal), filepath.Join(cmn.ProjectDir, wtNew))
+	cmd.AddArgs(filepath.Join(cmn.Config.ProjectDir, wtOriginal), filepath.Join(cmn.Config.ProjectDir, wtNew))
 
 	cmn.Debug("%s: command: %s\n", funcName, cmd.String())
 
-	if strings.HasPrefix(cmn.InitialDir, filepath.Join(cmn.ProjectDir, wtOriginal)) {
+	if strings.HasPrefix(cmn.Config.InitialDir, filepath.Join(cmn.Config.ProjectDir, wtOriginal)) {
 		return nil, fmt.Errorf("cannot move worktree; current working directory within worktree")
 	}
 
 	runDir := ""
-	if cmn.InitialDir == cmn.ProjectDir {
-		runDir = filepath.Join(cmn.InitialDir, cmn.DefaultBranch)
+	if cmn.Config.InitialDir == cmn.Config.ProjectDir {
+		runDir = filepath.Join(cmn.Config.InitialDir, cmn.Config.DefaultBranch)
 	} else {
-		runDir = cmn.InitialDir
+		runDir = cmn.Config.InitialDir
 	}
 	output, err := cmd.RunInDir(runDir)
 	if err != nil {
@@ -210,15 +210,15 @@ func WorktreeRemove(config *cmn.CfgRm, worktree string) ([]byte, error) {
 
 	cmn.Debug("%s: command: %s\n", funcName, cmd.String())
 
-	if strings.HasPrefix(cmn.InitialDir, filepath.Join(cmn.ProjectDir, worktree)) {
+	if strings.HasPrefix(cmn.Config.InitialDir, filepath.Join(cmn.Config.ProjectDir, worktree)) {
 		return nil, fmt.Errorf("cannot remove worktree; current working directory within worktree")
 	}
 
 	runDir := ""
-	if cmn.InitialDir == cmn.ProjectDir {
-		runDir = filepath.Join(cmn.InitialDir, cmn.DefaultBranch)
+	if cmn.Config.InitialDir == cmn.Config.ProjectDir {
+		runDir = filepath.Join(cmn.Config.InitialDir, cmn.Config.DefaultBranch)
 	} else {
-		runDir = cmn.InitialDir
+		runDir = cmn.Config.InitialDir
 	}
 	output, err := cmd.RunInDir(runDir)
 	if err != nil {

@@ -1,5 +1,5 @@
 // Package cmn implements common variables and utility functions for git-wt,
-// providing debug, exit, and configuration.
+// providing debug and configuration.
 package cmn
 
 import (
@@ -10,6 +10,13 @@ import (
 )
 
 type (
+	Cfg struct {
+		DebugFlag     bool   // Whether debug output is enabled.
+		DefaultBranch string // Default branch/worktree of the project.
+		InitialDir    string // Initial working directory of the program.
+		ProjectDir    string // Path of the project directory.
+	} // Configuration for the program.
+
 	CfgMk struct {
 		Branch      string
 		BranchReset string
@@ -29,32 +36,21 @@ type (
 )
 
 var (
-	Basename string // Base name of the program; injected during compile.
-	Version  string // Version of the program; injected during compile.
-
-	DebugFlag bool // Whether debug output is enabled.
-
-	InitialDir    string // Initial working directory of the program.
-	ProjectDir    string // Path of the project directory.
-	DefaultBranch string // Default branch/worktree of the project.
+	Basename string          // Base name of the program; injected during compile.
+	Version  string          // Version of the program; injected during compile.
+	Config   *Cfg   = &Cfg{} // Global configuration for the program.
 )
 
 // Debug writes debug output to Stderr if DebugFlag is true.
 func Debug(format string, args ...interface{}) {
-	if DebugFlag {
+	if Config.DebugFlag {
 		fmt.Fprintf(os.Stderr, "debug: "+format, args...)
 	}
 }
 
-// Exit writes the provided error details to Stderr then exits with the provided value.
-func Exit(retval int, format string, args ...interface{}) {
-	fmt.Fprintln(os.Stderr, fmt.Sprintf("error: "+format, args...))
-	os.Exit(retval)
-}
-
 // WriteConfig writes program's config file to cloned repo's project path.
 func WriteConfig(path string, branch string) error {
-	funcName := "WriteConfig"
+	funcName := "cmn.WriteConfig"
 	Debug("%s: begin\n", funcName)
 
 	// Set the configuration file name.
@@ -64,6 +60,7 @@ func WriteConfig(path string, branch string) error {
 	// Open the configuration file to write the config.
 	cfgFile, err := os.OpenFile(filename, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
+		Debug("%s: end\n", funcName)
 		return fmt.Errorf("could not create config file: %v", err.Error())
 	}
 	defer cfgFile.Close()
@@ -85,6 +82,7 @@ func findConfig(cwd string) (string, error) {
 
 	cfgFile, err := walkUpTree(cwd)
 	if err != nil {
+		Debug("%s: end\n", funcName)
 		return "", fmt.Errorf("no project config file found")
 	}
 
@@ -113,8 +111,8 @@ func walkUpTree(path string) (string, error) {
 			}
 			continue
 		} else {
-			ProjectDir = target
-			Debug("%s: project dir: %s\n", funcName, ProjectDir)
+			Config.ProjectDir = target
+			Debug("%s: project dir: %s\n", funcName, Config.ProjectDir)
 			Debug("%s: end\n", funcName)
 			return filename, nil
 		}
@@ -122,39 +120,44 @@ func walkUpTree(path string) (string, error) {
 }
 
 // InitConfig locates and reads the configuration file for use.
-func InitConfig() {
-	funcName := "cmn.initConfig"
+func InitConfig() error {
+	funcName := "cmn.InitConfig"
 	Debug("%s: begin\n", funcName)
 
 	// Get the current working directory.
 	cwd, err := os.Getwd()
 	if err != nil {
-		Exit(127, "error locating working directory: %s", err.Error())
+		Debug("%s: end\n", funcName)
+		return fmt.Errorf("%s: error locating working directory: %s", funcName, err.Error())
 	}
-	InitialDir = cwd
-	Debug("%s: set initial dir: %s\n", funcName, InitialDir)
+	Config.InitialDir = cwd
+	Debug("%s: set initial dir: %s\n", funcName, Config.InitialDir)
 
 	// Locate the config file.
-	cfgFile, _ := findConfig(InitialDir)
-	// if err != nil {
-	// 	Exit(127, "error locating config: %s", err.Error())
-	// }
+	cfgFile, err := findConfig(Config.InitialDir)
+	if err != nil {
+		Debug("%s: end\n", funcName)
+		return fmt.Errorf("%s: error locating config: %s", funcName, err.Error())
+	}
 	Debug("%s: config file: %s\n", funcName, cfgFile)
 
 	// Read the config file.
-	file, _ := os.ReadFile(cfgFile)
-	// if err != nil {
-	// 	Exit(127, "error reading config file: %s", err.Error())
-	// }
+	file, err := os.ReadFile(cfgFile)
+	if err != nil {
+		Debug("%s: end\n", funcName)
+		return fmt.Errorf("%s: error reading config file: %s", funcName, err.Error())
+	}
 	Debug("%s: config file contents > %s\n", funcName, string(file))
 	if file != nil {
 		if slices.Equal(file[0:9], []byte("default: ")) {
-			DefaultBranch = string(file[9:])
+			Config.DefaultBranch = string(file[9:])
 		} else {
-			// Exit(127, "error loading config file")
+			Debug("%s: end\n", funcName)
+			return fmt.Errorf(":%s: error parsing config file: invalid format", funcName)
 		}
 	}
-	Debug("%s: default branch: %s\n", funcName, DefaultBranch)
+	Debug("%s: default branch: %s\n", funcName, Config.DefaultBranch)
 
 	Debug("%s: end\n", funcName)
+	return nil
 }
