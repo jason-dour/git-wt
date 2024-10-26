@@ -25,18 +25,18 @@ Syntax is: `git wt <command>`
 Commands are:
 
 - `cl`
-    - Prepare a project directory by cloning the default branch and writing a
-      `git-wt` configuration file in that project directory.
+  - Prepare a project directory by cloning the default branch and writing a
+    `git-wt` configuration file in that project directory.
 - `ls`
-    - List the worktrees in the project.
+  - List the worktrees in the project.
 - `mk`
-    - Add a worktree to the project.
+  - Add a worktree to the project.
 - `mv`
-    - Move a worktree within the project.
+  - Move a worktree within the project.
 - `rm`
-    - Remove a worktree from the project.
+  - Remove a worktree from the project.
 - `xx`
-    - Reset the project.
+  - Reset the project.
 
 ## Project Layout
 
