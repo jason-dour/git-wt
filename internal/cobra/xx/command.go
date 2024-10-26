@@ -59,6 +59,11 @@ func checkConfig() error {
 	return nil
 }
 
+// getRemote gets the URL for the remote
+func getRemote() (string, error) {
+	return "", nil
+}
+
 // deleteProjectContents deletes all project directory contents except for the configuration file.
 func deleteProjectContents() error {
 	return nil
@@ -102,7 +107,15 @@ func run(cmd *cobra.Command, args []string) error {
 	// Delete everything and clone again.
 	if config.All {
 		cmn.Debug("%s: %s: deleting everything and cloning\n", command, funcName)
-		err := deleteProjectContents()
+
+		cmn.Debug("%s: %s: determine remote for cloning after delete\n", command, funcName)
+		remote, err := getRemote()
+		if err != nil {
+			return fmt.Errorf("error determining remote to clone after reset: %s", err.Error())
+		}
+		cmn.Debug("%s: %s: remote: %s", command, funcName, remote)
+
+		err = deleteProjectContents()
 		if err != nil {
 			return fmt.Errorf("error deleting project contents: %s", err.Error())
 		}
