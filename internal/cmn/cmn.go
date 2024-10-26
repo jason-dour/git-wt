@@ -3,10 +3,11 @@
 package cmn
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
+	"strings"
 )
 
 type (
@@ -153,13 +154,16 @@ func InitConfig() error {
 		Debug("%s: error: end", funcName)
 		return fmt.Errorf("%s: error reading config file: %s", funcName, err.Error())
 	}
-	Debug("%s: config file contents > %s", funcName, string(file))
-	if file != nil {
-		if slices.Equal(file[0:9], []byte("default: ")) {
-			Config.DefaultBranch = string(file[9:])
+	Debug("%s: config file length: %d", funcName, len(file))
+	scanner := bufio.NewScanner(strings.NewReader(string(file)))
+	for scanner.Scan() {
+		line := scanner.Text()
+		Debug("%s: config file line: %s", funcName, line)
+		if strings.HasPrefix(line, "default: ") {
+			Config.DefaultBranch = strings.Split(line, " ")[1]
+			break
 		} else {
-			Debug("%s: error: end", funcName)
-			return fmt.Errorf(":%s: error parsing config file: invalid format", funcName)
+			Debug("%s: invalid config line; skipping: %s", funcName, line)
 		}
 	}
 	Debug("%s: default branch: %s", funcName, Config.DefaultBranch)
