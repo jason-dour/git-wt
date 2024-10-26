@@ -3,6 +3,7 @@
 package git
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -20,7 +21,7 @@ func Clone(url string, branch string, path string) error {
 	// If Debug, set debug for git-module.
 	if cmn.Config.DebugFlag {
 		git.SetOutput(os.Stderr)
-		git.SetPrefix("debug: git-module:")
+		git.SetPrefix("debug: git-module: ")
 	}
 
 	err := git.Clone(url, path, git.CloneOptions{
@@ -30,6 +31,7 @@ func Clone(url string, branch string, path string) error {
 		return fmt.Errorf("could not clone repo: %s", err.Error())
 	}
 
+	cmn.Debug("%s: end\n", funcName)
 	return nil
 }
 
@@ -80,6 +82,37 @@ func GetDefaultBranch(url string) (string, error) {
 	// Return default branch.
 	cmn.Debug("%s: end\n", funcName)
 	return defaultBranch, nil
+}
+
+// GetRemote will get the remote URL for the origin.
+func GetRemote(directory string) (string, error) {
+	funcName := "git.getRemote"
+	cmn.Debug("%s: begin\n", funcName)
+
+	// g remote get-url origin
+
+	cmd := git.NewCommand("remote")
+	cmd.AddArgs("get-url", "origin")
+
+	cmn.Debug("%s: command: %s\n", funcName, cmd.String())
+
+	output, err := cmd.RunInDir(directory)
+	if err != nil {
+		return "", err
+	}
+	cmn.Debug("%s: output length: %d\n", funcName, len(output))
+
+	remote := ""
+	scanner := bufio.NewScanner(strings.NewReader(string(output)))
+	for scanner.Scan() {
+		cmn.Debug("%s: output line: %s\n", funcName, scanner.Text())
+		remote = scanner.Text()
+		break
+	}
+	cmn.Debug("%s: remote: %s\n", funcName, remote)
+
+	cmn.Debug("%s: end\n", funcName)
+	return remote, nil
 }
 
 // WorktreeAdd will add a worktree to the project.
