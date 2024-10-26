@@ -35,6 +35,8 @@ Commands are:
     - Move a worktree within the project.
 - `rm`
     - Remove a worktree from the project.
+- `xx`
+    - Reset the project.
 
 ## Project Layout
 

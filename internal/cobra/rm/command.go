@@ -30,22 +30,22 @@ func init() {
 // run provides the core execution of the 'rm' command.
 func run(cmd *cobra.Command, args []string) error {
 	funcName := "run"
-	cmn.Debug("%s: %s: begin\n", command, funcName)
+	cmn.Debug("%s: %s: begin", command, funcName)
 
 	// Load global configuration.
-	cmn.Debug("%s: %s: loading global config\n", command, funcName)
+	cmn.Debug("%s: %s: loading global config", command, funcName)
 	err := cmn.InitConfig()
 	if err != nil {
 		return fmt.Errorf("error loading configuration: %s", err.Error())
 	}
-	cmn.Debug("%s: %s: global config: %#v\n", command, funcName, cmn.Config)
+	cmn.Debug("%s: %s: global config: %#v", command, funcName, cmn.Config)
 
-	cmn.Debug("%s: %s: config: %#v\n", command, funcName, config)
-	cmn.Debug("%s: %s: args: %v\n", command, funcName, args)
+	cmn.Debug("%s: %s: config: %#v", command, funcName, config)
+	cmn.Debug("%s: %s: args: %v", command, funcName, args)
 
 	// Set the worktree name.
 	wtName := args[0]
-	cmn.Debug("%s: %s: worktree name: %s\n", command, funcName, wtName)
+	cmn.Debug("%s: %s: worktree name: %s", command, funcName, wtName)
 
 	// Remove the worktree.
 	output, err := git.WorktreeRemove(config, wtName)
@@ -54,6 +54,6 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 	fmt.Print(string(output))
 
-	cmn.Debug("%s: %s: end\n", command, funcName)
+	cmn.Debug("%s: %s: end", command, funcName)
 	return nil
 }

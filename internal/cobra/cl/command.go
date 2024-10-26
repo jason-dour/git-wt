@@ -25,18 +25,18 @@ var (
 
 func run(cmd *cobra.Command, args []string) error {
 	funcName := "run"
-	cmn.Debug("%s: %s: begin\n", command, funcName)
-	cmn.Debug("%s: %s: args: %v\n", command, funcName, args)
+	cmn.Debug("%s: %s: begin", command, funcName)
+	cmn.Debug("%s: %s: args: %v", command, funcName, args)
 
 	fmt.Printf("Cloning %s.\n", args[0])
 
 	// Get default branch from remote repository.
-	cmn.Debug("%s: %s: retrieving default branch from remote\n", command, funcName)
+	cmn.Debug("%s: %s: retrieving default branch from remote", command, funcName)
 	defaultBranch, err := git.GetDefaultBranch(args[0])
 	if err != nil {
 		return fmt.Errorf("could not retrieve default branch: %v", err.Error())
 	}
-	cmn.Debug("%s: run: defaultBranch: %v\n", command, defaultBranch)
+	cmn.Debug("%s: run: defaultBranch: %v", command, defaultBranch)
 
 	// Define clone path.
 	basename := filepath.Base(args[0])
@@ -57,6 +57,6 @@ func run(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Clone complete.\n")
 
-	cmn.Debug("%s: %s: end\n", command, funcName)
+	cmn.Debug("%s: %s: end", command, funcName)
 	return nil
 }
