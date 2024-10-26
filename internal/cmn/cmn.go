@@ -26,13 +26,20 @@ type (
 		Quiet       bool
 	} // Configuration for 'mk' command.
 
+	CfgMv struct {
+		Force bool
+	} // Configuration for 'mv' command.
+
 	CfgRm struct {
 		Force bool
 	} // Configuration for 'rm' command.
 
-	CfgMv struct {
-		Force bool
-	} // Configuration for 'mv' command.
+	CfgXx struct {
+		Branches  bool // Whether to reset branches.
+		Worktrees bool // Whether to reset worktrees.
+		Most      bool // Whether to reset both branches and worktrees.
+		All       bool // Whether to wipe everyting and clone again.
+	}
 )
 
 var (
