@@ -36,7 +36,6 @@ func run(cmd *cobra.Command, args []string) error {
 	cmn.Debug("%s: %s: loading global config\n", command, funcName)
 	err := cmn.InitConfig()
 	if err != nil {
-		cmn.Debug("%s: %s: error loading configuration: %s", command, funcName, err.Error())
 		return fmt.Errorf("error loading configuration: %s", err.Error())
 	}
 	cmn.Debug("%s: %s: global config: %#v\n", command, funcName, cmn.Config)

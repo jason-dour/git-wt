@@ -8,6 +8,7 @@ import (
 	"github.com/jason-dour/git-wt/internal/cobra/mk"
 	"github.com/jason-dour/git-wt/internal/cobra/mv"
 	"github.com/jason-dour/git-wt/internal/cobra/rm"
+	"github.com/jason-dour/git-wt/internal/cobra/xx"
 	"github.com/spf13/cobra"
 )
 
@@ -30,4 +31,5 @@ func init() {
 	Cmd.AddCommand(mk.Cmd)
 	Cmd.AddCommand(mv.Cmd)
 	Cmd.AddCommand(rm.Cmd)
+	Cmd.AddCommand(xx.Cmd)
 }
