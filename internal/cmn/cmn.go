@@ -25,6 +25,7 @@ type (
 		Force       bool
 		Track       bool
 		Quiet       bool
+		RefId       string
 	} // Configuration for 'mk' command.
 
 	CfgMv struct {

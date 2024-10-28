@@ -84,9 +84,41 @@ func GetBranches() ([]string, error) {
 	return branches, nil
 }
 
-// GetDefaultBranch will retrieve the default branch from a remote git repository.
-func GetDefaultBranch(url string) (string, error) {
-	funcName := "git.GetDefaultBranch"
+// GetRemote will get the remote URL for the origin.
+func GetRemote(directory string) (string, error) {
+	funcName := "git.getRemote"
+	cmn.Debug("%s: begin", funcName)
+
+	// g remote get-url origin
+
+	cmd := git.NewCommand("remote")
+	cmd.AddArgs("get-url", "origin")
+
+	cmn.Debug("%s: command: %s", funcName, cmd.String())
+
+	output, err := cmd.RunInDir(directory)
+	if err != nil {
+		cmn.Debug("%s: error: end", funcName)
+		return "", err
+	}
+	cmn.Debug("%s: output length: %d", funcName, len(output))
+
+	remote := ""
+	scanner := bufio.NewScanner(strings.NewReader(string(output)))
+	for scanner.Scan() {
+		cmn.Debug("%s: output line: %s", funcName, scanner.Text())
+		remote = scanner.Text()
+		break
+	}
+	cmn.Debug("%s: remote: %s", funcName, remote)
+
+	cmn.Debug("%s: end", funcName)
+	return remote, nil
+}
+
+// GetRemoteDefaultBranch will retrieve the default branch from a remote git repository.
+func GetRemoteDefaultBranch(url string) (string, error) {
+	funcName := "git.GetRemoteDefaultBranch"
 	cmn.Debug("%s: begin", funcName)
 
 	// If Debug, set debug for git-module.
@@ -135,36 +167,37 @@ func GetDefaultBranch(url string) (string, error) {
 	return defaultBranch, nil
 }
 
-// GetRemote will get the remote URL for the origin.
-func GetRemote(directory string) (string, error) {
-	funcName := "git.getRemote"
+// GetRemoteRefId will retrieve the commit id for a given ref.
+func GetRemoteRefId(url string, ref string) (string, error) {
+	funcName := "git.GetRemoteRefId"
 	cmn.Debug("%s: begin", funcName)
 
-	// g remote get-url origin
+	// If Debug, set debug for git-module.
+	if cmn.Config.DebugFlag {
+		git.SetOutput(os.Stderr)
+		git.SetPrefix("debug: git-module: ")
+	}
 
-	cmd := git.NewCommand("remote")
-	cmd.AddArgs("get-url", "origin")
-
-	cmn.Debug("%s: command: %s", funcName, cmd.String())
-
-	output, err := cmd.RunInDir(directory)
+	// Run ls-remote to grab all head refs.
+	refs, err := git.LsRemote(url, git.LsRemoteOptions{
+		Patterns: []string{
+			"refs/" + ref,
+		},
+	})
 	if err != nil {
 		cmn.Debug("%s: error: end", funcName)
-		return "", err
+		return "", fmt.Errorf("could not retrieve HEAD ref from remote: %s", err.Error())
 	}
-	cmn.Debug("%s: output length: %d", funcName, len(output))
 
-	remote := ""
-	scanner := bufio.NewScanner(strings.NewReader(string(output)))
-	for scanner.Scan() {
-		cmn.Debug("%s: output line: %s", funcName, scanner.Text())
-		remote = scanner.Text()
-		break
+	if len(refs) > 1 {
+		cmn.Debug("%s: error: end", funcName)
+		return "", fmt.Errorf("got more than one matching ref from remote: %d", len(refs))
 	}
-	cmn.Debug("%s: remote: %s", funcName, remote)
+
+	cmn.Debug("%s: found ref: %#v", funcName, refs[0])
 
 	cmn.Debug("%s: end", funcName)
-	return remote, nil
+	return refs[0].ID, nil
 }
 
 // WorktreeAdd will add a worktree to the project.
@@ -196,7 +229,11 @@ func WorktreeAdd(config *cmn.CfgMk, worktree string, commitish string) ([]byte, 
 	}
 
 	cmd.AddArgs(filepath.Join(cmn.Config.ProjectDir, worktree))
-	cmd.AddArgs(commitish)
+	if len(config.RefId) > 0 {
+		cmd.AddArgs(config.RefId)
+	} else {
+		cmd.AddArgs(commitish)
+	}
 
 	cmn.Debug("%s: command: %s", funcName, cmd.String())
 

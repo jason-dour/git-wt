@@ -3,6 +3,9 @@ package mk
 
 import (
 	"fmt"
+	"path/filepath"
+	"slices"
+	"strings"
 
 	"github.com/jason-dour/git-wt/internal/cmn"
 	"github.com/jason-dour/git-wt/internal/git"
@@ -83,6 +86,34 @@ func run(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		cmn.Debug("%s: %s: error: end", command, funcName)
 		return err
+	}
+
+	// Check if a PR/MR and grab ref.
+	prmr := []string{"pull/", "pr/", "merge-requests/", "mr/"}
+	if slices.ContainsFunc(prmr, func(s string) bool {
+		return strings.HasPrefix(commitish, s)
+	}) {
+		cmn.Debug("%s: %s: pr/mr ref specified; finding commit id", command, funcName)
+		url, err := git.GetRemote(filepath.Join(cmn.Config.ProjectDir, cmn.Config.DefaultBranch))
+		if err != nil {
+			cmn.Debug("%s: %s: error: end", command, funcName)
+			return err
+		}
+		cmn.Debug("%s: %s: remote: %s", command, funcName, url)
+
+		commitish = strings.Replace(commitish, "pr/", "pull/", -1)
+		commitish = strings.Replace(commitish, "mr/", "merge-requests/", -1)
+		if !strings.HasSuffix(commitish, "/head") {
+			commitish = commitish + "/head"
+		}
+		cmn.Debug("%s: %s: normalized ref: %s", command, funcName, commitish)
+
+		config.RefId, err = git.GetRemoteRefId(url, commitish)
+		if err != nil {
+			cmn.Debug("%s: %s: error: end", command, funcName)
+			return err
+		}
+		cmn.Debug("%s: %s: found commit id for ref: %s", command, funcName, config.RefId)
 	}
 
 	// Add the worktree.

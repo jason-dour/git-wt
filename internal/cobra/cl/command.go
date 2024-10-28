@@ -33,7 +33,7 @@ func run(cmd *cobra.Command, args []string) error {
 
 	// Get default branch from remote repository.
 	cmn.Debug("%s: %s: retrieving default branch from remote", command, funcName)
-	defaultBranch, err := git.GetDefaultBranch(args[0])
+	defaultBranch, err := git.GetRemoteDefaultBranch(args[0])
 	if err != nil {
 		cmn.Debug("%s: %s: error: end", command, funcName)
 		return fmt.Errorf("could not retrieve default branch: %v", err.Error())
