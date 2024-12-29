@@ -41,9 +41,16 @@ func run(cmd *cobra.Command, args []string) error {
 	cmn.Debug("%s: run: defaultBranch: %v", command, defaultBranch)
 
 	// Define clone path.
+	repo := ""
+	clonePath := ""
 	basename := filepath.Base(args[0])
-	repo := strings.TrimSuffix(basename, filepath.Ext(basename))
-	clonePath := filepath.Join(repo, defaultBranch)
+
+	if strings.HasSuffix(basename, ".git") {
+		repo = strings.TrimSuffix(basename, ".git")
+	} else {
+		repo = basename
+	}
+	clonePath = filepath.Join(repo, defaultBranch)
 
 	// Clone the repository.
 	err = git.Clone(args[0], defaultBranch, clonePath)
