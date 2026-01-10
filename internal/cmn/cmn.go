@@ -47,6 +47,7 @@ type (
 var (
 	Basename string          // Base name of the program; injected during compile.
 	Version  string          // Version of the program; injected during compile.
+	Commit   string          // Commit hash of the Version; injected during compile.
 	Config   *Cfg   = &Cfg{} // Global configuration for the program.
 )
 
