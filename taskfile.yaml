@@ -1,0 +1,104 @@
+version: 3
+
+silent: true
+
+vars:
+  RELEASE_OS:
+    - darwin
+    - linux
+    - windows
+  RELEASE_ARCH:
+    - amd64
+    - arm64
+  MODULE:
+    sh: awk '/^module/{print $2}' go.mod
+  BASENAME: "{{last (splitList \"/\" .MODULE)}}"
+  VERSION:
+    sh: cat VERSION
+  COMMIT:
+    sh: git show-ref --hash=7 HEAD
+  LD_FLAGS: "-X {{.MODULE}}/internal/cmn.Version={{.VERSION}} -X {{.MODULE}}/internal/cmn.Basename={{.BASENAME}} -X {{.MODULE}}/internal/cmn.Commit={{.COMMIT}}"
+
+tasks:
+  version:
+    desc: Show module and version information.
+    cmds:
+      - "echo MODULE: {{.MODULE}}"
+      - "echo BASENAME: {{.BASENAME}}"
+      - "echo VERSION: {{.VERSION}}"
+      - "echo COMMIT: {{.COMMIT}}"
+
+  build:
+    aliases:
+      - default
+    desc: Build for current OS and ARCH.
+    cmds:
+      - go build -ldflags "{{.LD_FLAGS}}" ./cmd/{{.BASENAME}}
+
+  release:
+    desc: Build release files for all defined OS and ARCH.
+    cmds:
+      - task: release:darwin
+      - task: release:linux
+      - task: release:windows
+
+  release:build:
+    internal: true
+    desc: Build release asset for specific OS and ARCH.
+    cmds:
+      - GOOS={{.OS}} GOARCH={{.ARCH}} go build -ldflags "{{.LD_FLAGS}}" -o {{.BASENAME}}_v{{.VERSION}}_{{.OS}}_{{.ARCH}}{{.EXE}} ./cmd/{{.BASENAME}}
+      - |
+        {{ if ne .OS "darwin" }}
+        {{ if eq .OS "windows" }}
+        mv {{.BASENAME}}_v{{.VERSION}}_{{.OS}}_{{.ARCH}}{{.EXE}} {{.BASENAME}}{{.EXE}}
+        zip -q9 {{.BASENAME}}_v{{.VERSION}}_{{.OS}}_{{.ARCH}}.zip {{.BASENAME}}{{.EXE}}
+        rm {{.BASENAME}}{{.EXE}}
+        {{ else }}
+        mv {{.BASENAME}}_v{{.VERSION}}_{{.OS}}_{{.ARCH}}{{.EXE}} {{.BASENAME}}{{.EXE}}
+        tar -zcf {{.BASENAME}}_v{{.VERSION}}_{{.OS}}_{{.ARCH}}.tar.gz {{.BASENAME}}{{.EXE}}
+        rm {{.BASENAME}}{{.EXE}}
+        {{ end }}
+        {{ end }}
+
+  release:linux:
+    internal: true
+    desc: Build release files for Linux.
+    cmds:
+      - for:
+          var: RELEASE_ARCH
+        vars:
+          OS: linux
+          ARCH: "{{.ITEM}}"
+        task: release:build
+
+  release:windows:
+    internal: true
+    desc: Build release files for Windows.
+    cmds:
+      - for: 
+          var: RELEASE_ARCH
+        vars:
+          OS: windows
+          ARCH: "{{.ITEM}}"
+          EXE: .exe
+        task: release:build
+
+  release:darwin:
+    internal: true
+    desc: Build release files for MacOS.
+    cmds:
+      - for: 
+          var: RELEASE_ARCH
+        vars:
+          OS: darwin
+          ARCH: "{{.ITEM}}"
+        task: release:build
+      - lipo -create -output {{.BASENAME}} {{.BASENAME}}_v{{.VERSION}}_darwin_amd64 {{.BASENAME}}_v{{.VERSION}}_darwin_arm64
+      - rm {{.BASENAME}}_v{{.VERSION}}_darwin_amd64 {{.BASENAME}}_v{{.VERSION}}_darwin_arm64
+      - tar -zcf {{.BASENAME}}_v{{.VERSION}}_darwin_universal.tar.gz {{.BASENAME}}
+      - rm {{.BASENAME}}
+
+  clean:
+    desc: Clean up the environment.
+    cmds:
+      - rm -rf {{.BASENAME}} {{.BASENAME}}.exe {{.BASENAME}}_v*

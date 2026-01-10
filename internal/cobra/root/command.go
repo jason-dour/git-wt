@@ -17,7 +17,7 @@ var (
 		Use:     cmn.Basename,
 		Long:    cmn.Basename + " - A git helper for managing worktrees as part of a workflow.",
 		Args:    cobra.NoArgs,
-		Version: cmn.Version,
+		Version: cmn.Version + " (" + cmn.Commit + ")",
 	} // Cobra root command definition.
 )
 
