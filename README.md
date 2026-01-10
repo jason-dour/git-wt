@@ -2,11 +2,6 @@
 
 Git Extension For Worktree Management
 
-## Caveat Emptor
-
-This is very new code. It has not had extensive testing. Use in full knowledge
-there may be bugs.
-
 ## Purpose
 
 This helper is intended to assist in managing git worktrees in a workflow based
