@@ -2,6 +2,19 @@
 
 Git Extension For Worktree Management
 
+## Installation
+
+You can either directly download binaries from the Releases page, build from
+source, or use `brew` on MacOS and Linux.
+
+### Brew
+
+```bash
+brew tap jason-dour/tap
+brew trust jason-dour/tap # Optional; allows for easier updates.
+brew install git-wt
+```
+
 ## Purpose
 
 This helper is intended to assist in managing git worktrees in a workflow based
